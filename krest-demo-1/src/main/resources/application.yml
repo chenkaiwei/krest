@@ -1,0 +1,19 @@
+
+
+krest:
+  enable-username-password-realm: true
+  jwt:
+    expire-time: 1m
+    #↑token过期时间，默认20分钟
+    refresh-time-before-expire: 40s
+    #↑过期前多久更新token。默认10分钟。若设为与expire-time一致则每次请求都会刷新。
+
+server:
+  port: 6001
+logging:
+  level:
+    com.chenkaiwei.krest: debug
+
+#spring:
+#  main:
+#    allow-circular-references: true

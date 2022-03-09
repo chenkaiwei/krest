@@ -1,0 +1,13 @@
+package com.chenkaiwei.krestdemo1;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class KrestDemo1Application {
+
+    public static void main(String[] args) {
+        SpringApplication.run(KrestDemo1Application.class, args);
+    }
+
+}

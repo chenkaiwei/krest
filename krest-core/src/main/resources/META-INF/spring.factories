@@ -1,0 +1,9 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.chenkaiwei.krest.config.KrestAutoConfiguration
+
+#这个配置文件和@Import() （加载启动类上时）是一样的功能
+#application子目录下会自动扫进去，不在子目录下的用这个配置引入，所以是第三方包自动配置的标配
+
+#该spring.factories文件必须为Properties格式，其接口或抽象类的完全合格的名称和值是一个逗号分隔的实现类名的列表。 例如：
+#example.MyService=example.MyServiceImpl1,example.MyServiceImpl2
+#原文链接：https://blog.csdn.net/qq_32448349/article/details/109155988

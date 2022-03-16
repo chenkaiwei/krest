@@ -1,26 +1,25 @@
 package com.chenkaiwei.krest.config;
 
 
-import com.chenkaiwei.krest.exceptions.KrestErrorController;
+import cn.hutool.core.lang.Assert;
+import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
+import com.chenkaiwei.krest.cryption.CryptionRequestAdvice;
+import com.chenkaiwei.krest.cryption.CryptionResponseAdvice;
+import com.chenkaiwei.krest.cryption.config.KrestMvcConfigurer;
 import com.chenkaiwei.krest.filters.JwtBearerHttpAuthenticationFilter;
-import com.chenkaiwei.krest.realms.JwtUtil;
+import com.chenkaiwei.krest.JwtUtil;
 import com.chenkaiwei.krest.realms.TokenValidateAndAuthorizingRealm;
 import com.chenkaiwei.krest.realms.UsernamePasswordRealm;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.AuthenticationInfo;
-import org.apache.shiro.authc.AuthenticationListener;
-import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.credential.CredentialsMatcher;
 import org.apache.shiro.authc.pam.FirstSuccessfulStrategy;
 import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
-import org.apache.shiro.subject.PrincipalCollection;
-import org.apache.shiro.web.filter.mgt.FilterChainResolver;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
-import org.apache.shiro.web.servlet.AbstractShiroFilter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,7 +30,7 @@ import java.util.*;
 @Slf4j
 @Configuration
 @EnableConfigurationProperties(KrestProperties.class)
-@Import({JwtUtil.class})
+@Import({JwtUtil.class, CryptionRequestAdvice.class, CryptionResponseAdvice.class,KrestMvcConfigurer.class})
 public class KrestAutoConfiguration {
 
 /**
@@ -54,9 +53,9 @@ public class KrestAutoConfiguration {
 //        return modularRealmAuthenticator;
 //    }
 
-    @ConditionalOnMissingBean
-    @Bean("securityManager")//shiro里自动配置的securityManager带一个参数【securityManager(List<Realm> realms)】，所以写了名字才能整个代替它
-    public DefaultWebSecurityManager securityManager(KrestProperties krestProperties,KrestConfigurer krestConfigurer,UsernamePasswordRealm usernamePasswordRealm,TokenValidateAndAuthorizingRealm tokenValidateAndAuthorizingRealm) {
+    @ConditionalOnMissingBean//TODO 有空研究：shiro里的那个自动securityManager也是OnMissingBean，为啥自动组装了这个没组装那个。
+    @Bean //shiro里自动配置的securityManager带一个参数【securityManager(List<Realm> realms)】，所以写了名字才能整个代替它
+    public DefaultWebSecurityManager securityManager(KrestProperties krestProperties,KrestConfigurer krestConfigurer,List<Realm> realms) {
         DefaultWebSecurityManager manager = new DefaultWebSecurityManager();
 
         //配置多个realm时的使用策略
@@ -81,16 +80,17 @@ public class KrestAutoConfiguration {
 //        });
         manager.setAuthenticator(modularRealmAuthenticator);
 
-        Collection<Realm> realms = new ArrayList();
-        realms.add(tokenValidateAndAuthorizingRealm());
-        //根据配置决定要不要加上usernamePasswordRealm
-        if (krestProperties.isEnableUsernamePasswordRealm()){
-            log.info("enable-username-password-realm: true");
-            realms.add(usernamePasswordRealm);
-        }
+//        Collection<Realm> realms = new ArrayList();
+//        realms.add(tokenValidateAndAuthorizingRealm());
+//        //根据配置决定要不要加上usernamePasswordRealm
+//        if (krestProperties.isEnableUsernamePasswordRealm()){
+//            log.debug("enable-username-password-realm: true");
+//            realms.add(usernamePasswordRealm);
+//        }
+
         manager.setRealms(realms);
 
-        //setRealms执行完会有一个afterRealmsSet，把realms同时也加到Authenticator里，所以上面两条顺序不能换
+        //setRealms执行完会有一个afterRealmsSet，把realms同时也加到Authenticator里，所以上面两条顺序不能换（shiro源码中有好几处强制要求代码顺序的地方，稳健性差）
 
 
         return manager;
@@ -157,10 +157,14 @@ public class KrestAutoConfiguration {
 
 
     /*定义俩realm*/
-    @Bean//只要不用就不会生成，所以写着也没事
+    @Bean
+    @ConditionalOnProperty(prefix = "krest",value = "enable-username-password-realm",matchIfMissing = false)
+    //↑ 可选项，不显示设置则不装载
     public UsernamePasswordRealm usernamePasswordRealm(KrestConfigurer krestConfigurer) {
         UsernamePasswordRealm usernamePasswordRealm = new UsernamePasswordRealm();
-        usernamePasswordRealm.setCredentialsMatcher(krestConfigurer.createPasswordCredentialsMatcher());//写到realm的构造器里去
+        CredentialsMatcher credentialsMatcher=krestConfigurer.configPasswordCredentialsMatcher();
+        Assert.notNull(credentialsMatcher,"您尚未实现krestConfigurer.createPasswordCredentialsMatcher()接口");
+        usernamePasswordRealm.setCredentialsMatcher(credentialsMatcher);//写到realm的构造器里去
         return usernamePasswordRealm;
     }
 
@@ -211,10 +215,23 @@ public class KrestAutoConfiguration {
     /*原shiro部分end*/
 
     @Bean
-    public Map<String, List<String>> rolePermissionsMap(KrestConfigurer krestConfigurer){
+    public Map<String, Collection<String>> rolePermissionsMap(KrestConfigurer krestConfigurer){
         //↗入参部分，改成Autowire定义在外面就不行，这种写法就灵活很多，自动解决依赖顺序问题
-        Map<String, List<String>> res=krestConfigurer.createRolePermissionsMap();
+        Map<String, Collection<String>> res=krestConfigurer.configRolePermissionsMap();
         return res;
     }
 
+    @Bean
+    //亲测俩叠加可以 ↓，且的关系
+    @ConditionalOnMissingBean
+    @ConditionalOnProperty(prefix = "krest",value = "enable-fast-json-converter",matchIfMissing = true)
+    //↑ 注意，用yml里的属性名，不是properties里的属性名（enableFastJsonConverter）。
+    public FastJsonHttpMessageConverter fastJsonHttpMessageConverter(KrestConfigurer krestConfigurer) {
+
+        FastJsonHttpMessageConverter res = new FastJsonHttpMessageConverter();
+
+        res.setFastJsonConfig(krestConfigurer.fastJsonConverterConfig());
+
+        return res;
+    }
 }

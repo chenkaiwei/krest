@@ -1,0 +1,406 @@
+{
+	"info": {
+		"_postman_id": "9d8fc497-ecb9-45ee-982e-20aadfe4cf05",
+		"name": "KrestDemo",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "login-admin",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\":\"zhang3\",\n    \"password\":\"12345\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/login",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login-user",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\":\"li4\",\n    \"password\":\"66666\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/krest-demo1/login",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"krest-demo1",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login-user-error",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\":\"li40\",\n    \"password\":\"666660\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/login",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "whoami",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/krest-demo1/whoami",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"krest-demo1",
+						"whoami"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "权限测试(permissionDemo)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/permissionDemo",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"permissionDemo"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "token error",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "xxxxxx",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/krest-demo1/whoami",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"krest-demo1",
+						"whoami"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "路径错误",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "xxxxxx",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/xxxxx",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"xxxxx"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "cryptionTest",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const key = CryptoJS.enc.Utf8.parse(\"128bitsSecretkey\");  //临时密钥，对称加密消息内容",
+							"const iv = CryptoJS.enc.Utf8.parse('1111222233334444');   //十六位十六进制数作为密钥偏移量",
+							"    ",
+							"    //解密方法",
+							"function Decrypt(word) {",
+							"        let encryptedHexStr = CryptoJS.enc.Hex.parse(word);",
+							"        let srcs = CryptoJS.enc.Base64.stringify(encryptedHexStr);",
+							"        let decrypt = CryptoJS.AES.decrypt(srcs, key, { iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 });",
+							"        let decryptedStr = decrypt.toString(CryptoJS.enc.Utf8);",
+							"        return decryptedStr.toString();",
+							"    }",
+							"    ",
+							"    //加密方法",
+							"function Encrypt(word) {",
+							"        let srcs = CryptoJS.enc.Utf8.parse(word);",
+							"        let encrypted = CryptoJS.AES.encrypt(srcs, key, { iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 });",
+							"        return encrypted.ciphertext.toString().toUpperCase();",
+							"}",
+							"//↓用临时秘钥加密消息体部分",
+							"var contentStr=\"{'aaa':'来自客户端的消息内容rrr001002'}\";",
+							"var encryptContent=Encrypt(contentStr);",
+							"pm.environment.set(\"encryptContent\",encryptContent);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Cryption",
+						"value": "cdMt51u730b+2BX59e675FwMRIiiVJcuV+ABLjgaK5tHSj2j27I1VGgwisHAhC4sVvM6vh67xK36VFRMwpVw1VnXhPKSoLVz417UdETZx8Qv/6CHNw4p/WI8Ian5BNHabvV07FMs85vXfzrYnUp/ObrduLv/x2h8mOfXs1S8Dls=",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{{encryptContent}}",
+					"options": {
+						"raw": {
+							"language": "text"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/cryptionTest",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"cryptionTest"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "cryptBothTest",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const key = CryptoJS.enc.Utf8.parse(\"128bitsSecretkey\");  //临时密钥，对称加密消息内容，十六位",
+							"const iv = CryptoJS.enc.Utf8.parse('1111222233334444');   //十六位十六进制数作为密钥偏移量，和服务端约好",
+							"    ",
+							"    //解密方法",
+							"function Decrypt(word) {",
+							"        let encryptedHexStr = CryptoJS.enc.Hex.parse(word);",
+							"        let srcs = CryptoJS.enc.Base64.stringify(encryptedHexStr);",
+							"        let decrypt = CryptoJS.AES.decrypt(srcs, key, { iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 });",
+							"        let decryptedStr = decrypt.toString(CryptoJS.enc.Utf8);",
+							"        return decryptedStr.toString();",
+							"    }",
+							"    ",
+							"    //加密方法",
+							"function Encrypt(word) {",
+							"        let srcs = CryptoJS.enc.Utf8.parse(word);",
+							"        let encrypted = CryptoJS.AES.encrypt(srcs, key, { iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 });",
+							"        return encrypted.ciphertext.toString().toUpperCase();",
+							"}",
+							"//↓用临时秘钥加密消息体部分",
+							"var contentStr=\"{'username':'测试用usernameaaaa'}\";",
+							"var encryptContent=Encrypt(contentStr);",
+							"pm.environment.set(\"encryptContent\",encryptContent);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// const key = CryptoJS.enc.Utf8.parse(\"128bitsSecretkey\");  //临时密钥，对称加密消息内容，十六位",
+							"// const iv = CryptoJS.enc.Utf8.parse('1111222233334444');   //十六位十六进制数作为密钥偏移量，和服务端约好",
+							"    ",
+							"//     //解密方法",
+							"// function Decrypt(word) {",
+							"//         let encryptedHexStr = CryptoJS.enc.Hex.parse(word);",
+							"//         let srcs = CryptoJS.enc.Base64.stringify(encryptedHexStr);",
+							"//         let decrypt = CryptoJS.AES.decrypt(srcs, key, { iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 });",
+							"//         let decryptedStr = decrypt.toString(CryptoJS.enc.Utf8);",
+							"//         return decryptedStr.toString();",
+							"//     }",
+							"",
+							"",
+							"//     var decryptContent=Decrypt(responseBody);",
+							"//     pm.environment.set(\"decryptContent\",decryptContent);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Cryption",
+						"value": "cdMt51u730b+2BX59e675FwMRIiiVJcuV+ABLjgaK5tHSj2j27I1VGgwisHAhC4sVvM6vh67xK36VFRMwpVw1VnXhPKSoLVz417UdETZx8Qv/6CHNw4p/WI8Ian5BNHabvV07FMs85vXfzrYnUp/ObrduLv/x2h8mOfXs1S8Dls=",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{{encryptContent}}",
+					"options": {
+						"raw": {
+							"language": "text"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/cryptBothTest",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"cryptBothTest"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"var data = JSON.parse(responseBody);",
+					"if(data.token!=null){",
+					"pm.globals.set(\"token\",data.token);",
+					"}"
+				]
+			}
+		}
+	]
+}

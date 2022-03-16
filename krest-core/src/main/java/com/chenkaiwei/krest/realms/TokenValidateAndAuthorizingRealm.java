@@ -1,6 +1,7 @@
 package com.chenkaiwei.krest.realms;
 
 import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.chenkaiwei.krest.JwtUtil;
 import com.chenkaiwei.krest.entity.JwtUser;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
@@ -10,7 +11,6 @@ import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.springframework.beans.factory.annotation.Qualifier;
 
 import javax.annotation.Resource;
 import java.util.*;

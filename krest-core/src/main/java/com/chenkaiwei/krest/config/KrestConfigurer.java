@@ -1,25 +1,35 @@
 package com.chenkaiwei.krest.config;
 
+import cn.hutool.crypto.asymmetric.AsymmetricCrypto;
+import cn.hutool.crypto.symmetric.SymmetricCrypto;
+import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.alibaba.fastjson.support.config.FastJsonConfig;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.chenkaiwei.krest.entity.KrestUsernamePasswordAuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authc.credential.CredentialsMatcher;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 //参考WebMvcConfigurer
 public interface KrestConfigurer {
 
+    Algorithm jwtAlgorithm = null;
+
+
+    /*==强制实现部分↓===*/
+    /** 角色-权限对照表，以map的形式。
+     * @return*/
+    Map<String, Collection<String>> configRolePermissionsMap();
+
+    /* jwt的加密策略*/
+    Algorithm configJwtAlgorithm();
+
+
     /*shiro部分*/
-    default KrestUsernamePasswordAuthenticationInfo doGetUsernamePasswordAuthenticationInfo(UsernamePasswordToken usernamePasswordToken){
-        return null;
-    }
-
-    default CredentialsMatcher createPasswordCredentialsMatcher(){
-        return null;
-    }
-
     default void configFilterChainDefinitionMap(Map<String, String> filterRuleMap){
         //默认这四个匹配规则不验证jwt，如果覆盖这四个也要重新加上
         filterRuleMap.put("/static/*", "anon");
@@ -27,13 +37,50 @@ public interface KrestConfigurer {
         filterRuleMap.put("/register", "anon");
         filterRuleMap.put("/login", "anon");//确保即使login里带了token也能不参与验证
     }
+/*
+    开启UsernamePassword模式后使用 ↓
+*/
+    default KrestUsernamePasswordAuthenticationInfo doGetUsernamePasswordAuthenticationInfo(UsernamePasswordToken usernamePasswordToken){
+        return null;
+    }
 
-    /** 角色-权限对照表，以map的形式。*/
-    Map<String, List<String>> createRolePermissionsMap();
+    default CredentialsMatcher configPasswordCredentialsMatcher(){
+        return null;
+    }
 
-    /*↓ jwt部分*/
-    /*
-    * jwt的加密策略*/
-    Algorithm createJwtAlgorithm();
+
+
+
+    /*↓Cryption策略部分*/
+
+    /*用于加解密临时秘钥的不对称加密，和客户端的公钥成对*/
+    default AsymmetricCrypto initTempSecretKeyCryptoAlgorithm(){
+        return null;
+    };
+
+    /*用客户端传来的临时秘钥 生成当次请求的消息体加解密策略*/
+    default SymmetricCrypto createMessageBodyCryptoAlgorithm(String tempSecretKey){
+        return null;
+    };
+
+
+    /*可以自行配置返回消息json的策略，主要是空值时统一规范*/
+    default FastJsonConfig fastJsonConverterConfig(){
+
+        FastJsonConfig fj = new FastJsonConfig();
+
+//　　1、WriteNullListAsEmpty  ：List字段如果为null,输出为[],而非null
+//　　2、WriteNullStringAsEmpty ： 字符类型字段如果为null,输出为"",而非null
+//　　3、DisableCircularReferenceDetect ：消除对同一对象循环引用的问题，默认为false（如果不配置有可能会进入死循环）
+//　　4、WriteNullBooleanAsFalse：Boolean字段如果为null,输出为false,而非null
+//　　5、WriteMapNullValue：是否输出值为null的字段,默认为false。
+        fj.setSerializerFeatures(
+                SerializerFeature.DisableCircularReferenceDetect,
+                SerializerFeature.WriteNullBooleanAsFalse,
+                SerializerFeature.WriteNullListAsEmpty,
+                SerializerFeature.WriteNullStringAsEmpty);//
+        return fj;
+    }
+
 
 }

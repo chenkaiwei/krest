@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chenkaiwei.krestdemodb.dao.UserDao">
+
+    <resultMap id="BaseResultMap" type="com.chenkaiwei.krestdemodb.entity.User">
+        <!--@Table user-->
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="username" column="name" jdbcType="VARCHAR"/>
+        <result property="password" column="password" jdbcType="VARCHAR"/>
+        <result property="salt" column="salt" jdbcType="VARCHAR"/>
+
+        <collection property="roles" ofType="String">
+            <result property="name" column="rname" jdbcType="VARCHAR"/>
+        </collection>
+    </resultMap>
+
+    <resultMap id="ShortResultMap" type="com.chenkaiwei.krestdemodb.entity.User">
+        <!--@Table user-->
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="username" column="name" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="queryUserByName" resultMap="BaseResultMap">
+        select u.id, u.name, u.password, u.salt,r.name rname
+from user u
+    left join user_role ur on u.id = ur.uid
+    left join role r on ur.rid = r.id
+where u.name = #{username}
+    </select>
+
+    <!--SELECT u.id,u.name FROM user u-->
+    <select id="listAllUsers" resultMap="ShortResultMap">
+        SELECT u.id,u.name FROM user u
+    </select>
+
+    <insert id="addUser">
+INSERT INTO `user` (`id`, `name`, `password`, `salt`)
+VALUES (#{id}, #{username}, #{password}, #{salt});
+    </insert>
+</mapper>

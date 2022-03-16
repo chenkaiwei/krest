@@ -1,0 +1,23 @@
+server:
+  port: 6001
+
+krest:
+  enable-username-password-realm: true
+
+mybatis:
+  mapper-locations: classpath:/mapper/*Dao.xml
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/rbac_public_demo?useUnicode=true&characterEncoding=utf-8&useSSL=false
+    username: root
+    password: Ckw_1988
+
+logging:
+  level:
+    root: info
+    # ERROR、WARN、INFO、DEBUG。
+    com:
+      chenkaiwei:
+        krestdemodb:
+          dao: debug

@@ -3,31 +3,18 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.6.3</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <groupId>com.chenkaiwei.krest</groupId>
+        <artifactId>krest-parent</artifactId>
+        <version>1.0.3</version>
+        <relativePath>../pom.xml</relativePath><!-- lookup parent from repository -->
     </parent>
     <groupId>com.chenkaiwei.krest</groupId>
     <artifactId>krest-core</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
     <name>krest-core</name>
+    <version>${parent.version}</version>
     <packaging>jar</packaging>
     <description>krest-core project for Spring Boot</description>
-    <properties>
-        <java.version>1.8</java.version>
-    </properties>
     <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
 
         <!--自动生成spring-configuration-metadata.json，用于配置文件yml自动补全-->
         <dependency>
@@ -50,25 +37,18 @@
             <artifactId>shiro-spring-boot-web-starter</artifactId>
             <version>1.8.0</version>
         </dependency>
+        <!--↓ 加密部分的依赖-->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>1.2.76</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>5.5.7</version>
+        </dependency>
     </dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-
-<!--                <configuration>-->
-<!--                    <excludes>-->
-<!--                        <exclude>-->
-<!--                            <groupId>org.projectlombok</groupId>-->
-<!--                            <artifactId>lombok</artifactId>-->
-<!--                        </exclude>-->
-<!--                    </excludes>-->
-<!--                </configuration>-->
-            </plugin>
-
-        </plugins>
-    </build>
 
 </project>

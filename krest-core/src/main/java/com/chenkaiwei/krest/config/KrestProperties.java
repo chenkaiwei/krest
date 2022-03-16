@@ -1,6 +1,5 @@
 package com.chenkaiwei.krest.config;
 
-import com.sun.istack.internal.NotNull;
 import lombok.Data;
 import lombok.ToString;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -19,6 +18,8 @@ import java.util.List;
 public class KrestProperties {
 
     private boolean enableUsernamePasswordRealm = false;
+
+    private boolean enableFastJsonConverter = true;
 
 
 }

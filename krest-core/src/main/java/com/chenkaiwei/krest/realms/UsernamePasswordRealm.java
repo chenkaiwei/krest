@@ -1,5 +1,6 @@
 package com.chenkaiwei.krest.realms;
 
+import cn.hutool.core.lang.Assert;
 import com.chenkaiwei.krest.config.KrestConfigurer;
 import com.chenkaiwei.krest.entity.KrestUsernamePasswordAuthenticationInfo;
 import lombok.extern.slf4j.Slf4j;
@@ -57,6 +58,8 @@ public class UsernamePasswordRealm extends AuthenticatingRealm {//只管验证�
         UsernamePasswordToken usernamePasswordToken=(UsernamePasswordToken) token;
 
         KrestUsernamePasswordAuthenticationInfo kpai=krestConfigurer.doGetUsernamePasswordAuthenticationInfo(usernamePasswordToken);
+
+        Assert.notNull(kpai,"您尚未实现krestConfigurer.doGetUsernamePasswordAuthenticationInfo接口");
 
         SimpleAuthenticationInfo res = new SimpleAuthenticationInfo(kpai.getJwtUser(),kpai.getPasswordInDB(), ByteSource.Util.bytes(kpai.getSalt()),getName());
         return res;

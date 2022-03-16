@@ -1,15 +1,16 @@
 # KRest
 
 ## 介绍
-krest是一款基于RESTful规则的轻量级框架套装，旨在整合无状态服务中的常见基础模块（Jwt+shiro），并为开发人员提供更简洁的配置和更易用的方法接口。包含身份验证、权限控制、通信加密等功能。具有耦合低、侵入性小、配置灵活、普适性强等特点。
+krest是一款基于RESTful规则的轻量级框架套装，旨在整合无状态服务中的常见基础模块，从而帮助开发人员降低工作难度和学习成本。功能包含身份验证、权限控制、通信加密等。具有耦合低、侵入性小、配置灵活、普适性强等特点。
 
 
 ## 产品特性
-* 配置方式简洁轻便。一个配置文件包揽所有配置，帮助用户从原本繁琐的配置整合工作中解脱出来。用户只需实现少量最必要配置接口，即可完成一整套jwt+shiro+通信加密服务框架的搭建。
-* 耦合低，侵入性小，普适性好。本框架无需导入任何数据库或远程缓存配置，所有数据的存取方式完全由用户自行设计和定义。用户只需确保权限数据的设计符合RBAC规范，即可无障碍接入本框架。
+* 核心功能由shiro+jwt实现，通用性好，规则成熟可靠。
+* 配置方式简洁轻便。本产品采用代理模式，将原本繁琐的配置工作整合到一个配置文件中来，最大程度地帮助用户精简配置工作。用户只需实现少量最必要配置接口，即可完成一整套功能完善的RESTful服务框架的搭建。
+* 耦合低，侵入性小，普适性好。本框架不会接管任何数据库或远程缓存配置，用户可以完全保留原本的数据存储获取方式。只需确保权限数据的设计符合RBAC规范，即可无障碍接入本框架。
 * 可扩展性好，使用自由灵活。本框架采用SpringBoot的自动装配机制实现对shiro和jwt的封装，原本shiro框架的功能依然可以完全不受影响地自定义和扩展。
-* 权限控制部分继承了shiro的强大灵活的注解功能，简洁易用。身份验证部分继承了Jwt策略和RESTful无状态设计的优越特性，诸如更节约服务器资源、更便于分布式扩展及更易于适配移动app、小程序、网页开发等多种客户端平台共同使用等，不再赘述。
-* （//TODO 通过简单的注解实现通信加密，该功能将在后续版本实现。）
+* 继承了shiro+jwt框架的所有优点。诸如更节约服务器资源、更便于分布式扩展及更易于适配移动app、小程序、网页开发等多种客户端平台共同使用等，不再赘述。
+* 本框架另行包含一个通信加密模块，配置简单功能强大。
 
 ## 版本要求
 
@@ -22,45 +23,47 @@ krest是一款基于RESTful规则的轻量级框架套装，旨在整合无状�
     <dependency>
        <groupId>com.chenkaiwei.krest</groupId>
        <artifactId>krest-core</artifactId>
+        <version>${最新是啥就写啥}</version>
     </dependency>
     ```
     
 2.  新建一个config类（或在您原有的config类上）实现KrestConfigurer接口
     ```java
-    @Configuration
-    public class DemoConfig implements KrestConfigurer {  
-        //按下图方式配置角色-权限映射，返回值中key为角色（Role）名称，value为该角色所拥有的所有权限（Permission）
+        @Configuration
+        public class DemoConfig implements KrestConfigurer {  
+            //按下图方式配置角色-权限映射，返回值中key为角色（Role）名称，value为该角色所拥有的所有权限（Permission）
+            
         @Override
-        public Map<String, List<String>> createRolePermissionsMap() {
-            Map<String, List<String>> res=new HashMap<String, List<String>>();
+        public Map<String, Collection<String>> configRolePermissionsMap() {
+            Map<String, Collection<String>> res=new HashMap<String, Collection<String>>();
             res.put("admin", Arrays.asList("p1","p2","p3","p4"));
             res.put("user", Arrays.asList("p3","p4"));
-            //您可以将该对照关系配置在数据库或远端缓存等任意容器中，按照您自己的方式获取并在此处返回即可。此处硬编码仅作示范之用
             return res;
         }
-        //返回jwt Token的加密策略，字符串部分为秘钥
+            //返回jwt Token的加密策略，字符串部分为秘钥
         @Override
-        public Algorithm createJwtAlgorithm() {
+        public Algorithm configJwtAlgorithm() {
             return Algorithm.HMAC256("mydemosecretkey");
         }
-    }
+        }
     ```
     
 3.  （可选）实现登录方法。如果您的客户端已经拥有了token，则可跳过本步骤。
 
     在您的登录方法中加入以下代码：
     ```java
-    //if(您自己的登录逻辑，验证通过后：)
-    JwtUser jwtUser=new JwtUser("zhang3", Arrays.asList("admin"));
-    resultBody.put("token",KrestUtil.createJwtTokenByUser(jwtUser));
+        //if(您自己的登录逻辑，验证通过后：)
+        JwtUser jwtUser=new JwtUser("zhang3", Arrays.asList("admin"));
+        //↑ 您确认已登陆的用户及其角色信息。
+        resultBody.put("token",KrestUtil.createJwtTokenByUser(jwtUser));
     ```
     
-    本段代码的功能为将用户名和该用户的角色（Role）列表转换为一个token（按照jwt规则实现）并返回给客户端。基于jwt验证机制，只需将token返回给客户端即视为已经登录完成。
+    本段代码的功能为以 该用户名和该用户的角色（Role）列表生成一个token（按照jwt规则实现）并返回给客户端。基于jwt验证机制，只需将token返回给客户端即视为已经登录完成。
     
     本例中zhang3为用户名，admin为其角色。该角色名必须与步骤2中的key对应。
     
 4. 客户端的操作(即Jwt令牌使用规则)：
-    客户端在获取到token后，应将其加上"Bearer "前缀使用。在后续的请求中，将该"Bearer "+token的字符串以"Authorization"为属性名加到请求头中，即可自动实现身份验证。
+    客户端在获取到token后，应将其加上"Bearer "前缀使用。在后续的请求中，只须将该"Bearer "+token的字符串以"Authorization"为属性名加到请求头中，即可自动实现身份验证。
     
     完成后的效果类似下表
     
@@ -70,9 +73,9 @@ krest是一款基于RESTful规则的轻量级框架套装，旨在整合无状�
    
    注意：Bearer和令牌字符串之间有且仅有一个半角空格。
       
-5. 服务端的操作，在所有业务请求的返回值中，加入以下代码，实现Token的自动刷新。
+5. 服务端的操作，在所有业务请求的返回值中，加入以下代码，即可按照步骤6中配置的过期时间和刷新时间实现Token的自动刷新。
     ```java
-    resBody.put("token",KrestUtil.getNewJwtTokenIfNeeded());
+    resBody.put("token",KrestUtil.createNewJwtTokenIfNeeded());
     ```
    一般建议使用ResponseBodyAdvice等方式统一封装在返回结果中。
    
@@ -99,8 +102,9 @@ krest是一款基于RESTful规则的轻量级框架套装，旨在整合无状�
     @RequiresPermissions("p1")//当用户拥有"p1"权限时才被许可访问该方法。以此便捷地实现粗粒度的权限控制。
     public Map permissionDemo(){
         Map<String,String> res=new HashMap<>();
-        res.put("result","you have got the permission [p1]");
-        res.put("token",KrestUtil.getNewJwtTokenIfNeeded());
+        res.put("result","you have got the permission [permissionDemo]");
+        res.put("token",KrestUtil.createNewJwtTokenIfNeeded());
+
 
         return res;
     }
@@ -119,16 +123,31 @@ krest是一款基于RESTful规则的轻量级框架套装，旨在整合无状�
    您仅需在config文件中配置一些最必要的设置即可实现。其具体规则参考krest-demo-1源码。
      
    #### 自定义异常返回
-   1. 继承KrestErrorController并覆盖getErrorResponseBody方法来自定义返回错误时的数据结构。
-   2. 通过定义全局ExceptionHandler来捕获异常。具体规则参考demo中的GlobalExceptionController文件。
-
-## 暂定后续开发规划
-
-   1.增加接口的加解密功能。使用注解来配置。
    
-   2.完善异常捕获和返回机制，统一异常类型和接口。
+   1. 继承KrestErrorController并覆盖getErrorResponseBody方法来自定义返回错误时的数据结构。
+   
+   2. 通过定义全局ExceptionHandler来捕获异常。具体规则参考demo中的GlobalExceptionController文件。
+   
+   #### 通信加密模块
+   
+   本框架还包含一个通信加密模块。使用规范如下：
+   
+   1. 由客户端生成一个临时秘钥(tempSecretKey)，使用 对称加密 策略将整条消息体加密（也可只加密您需要的字段）。加密策略由客户端服务端约定。
+   
+   2. 与服务端约定一个不对称加密策略，仅用以加密解密临时秘钥（tempSecretKey）。公钥由客户端维护，私钥由服务端维护。客户端在访问服务端的加密接口前，将临时秘钥用不对称加密的公钥加密后放入头信息的Cryption字段中。伴随经临时秘钥加密的消息体一并发送到服务端对应的接口。
+   
+   3. 您在服务端需要实现的配置为initTempSecretKeyCryptoAlgorithm（即步骤2中的加解密临时秘钥的不对称加密策略）和createMessageBodyCryptoAlgorithm（即步骤1中使用临时秘钥加解密消息体的对称加解密策略）两处
+   
+   4. 服务端对应的加密接口由@Cryption注解标签修饰。该注解包含四种策略：请求时的消息体全加密、返回时的消息体全加密、以上二种叠加、自定义的局部消息加密。
+   
+   5. 前三种加解密模式由框架自动完成。自定义局部信息加解密，通过调用KrestUtil.decryptMessageBody和KrestUtil.encryptMessageBody来加/解密您与客户端所约定的相应密文字段来实现。
+   
+   6. 在服务端加密配置和具体实现的语法参考krest-demo-1。在客户端将KrestDemo.postman_collection.json导入postman，参考这个。
+
+## 后续开发计划
+  * 完善javadoc注解
    
 ## 联系作者
-本产品仍处于起步阶段。欢迎试用并留下宝贵意见。如您在本产品的使用中有任何疑问或交流建议，请随时联系作者。
+欢迎试用并留下宝贵意见，帮助本产品逐步完善和成熟。如您在本产品的使用中有任何疑问或交流建议，请随时联系作者。
 * Email:ckw1988@163.com
 * QQ群：818464800（推荐）

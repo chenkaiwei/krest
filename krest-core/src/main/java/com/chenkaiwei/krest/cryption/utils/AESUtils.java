@@ -1,4 +1,4 @@
-//package com.chenkaiwei.krest.cryption.utils;
+package com.chenkaiwei.krest.cryption.utils;//package com.chenkaiwei.krest.cryption.utils;
 //
 //import org.apache.commons.codec.binary.Base64;
 //import org.slf4j.Logger;

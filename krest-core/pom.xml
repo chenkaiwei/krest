@@ -11,7 +11,7 @@
     <groupId>com.chenkaiwei.krest</groupId>
     <artifactId>krest-core</artifactId>
     <name>krest-core</name>
-    <version>${parent.version}</version>
+    <version>${project.parent.version}</version>
     <packaging>jar</packaging>
     <description>krest-core project for Spring Boot</description>
     <dependencies>

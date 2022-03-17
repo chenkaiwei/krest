@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.chenkaiwei.krest</groupId>
     <artifactId>krest-parent</artifactId>
-    <version>1.0.3</version><!-- ←每次这里更改，core和demos里跟着各改一处，保证一致-->
+    <version>1.0.4-SNAPSHOT</version><!-- ←每次这里更改，core和demos里跟着各改一处，保证一致-->
     <!-- Snapshot 方便拷贝-->
     <name>krest</name>
     <packaging>pom</packaging>

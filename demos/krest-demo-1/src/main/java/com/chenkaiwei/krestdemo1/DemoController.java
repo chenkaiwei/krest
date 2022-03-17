@@ -127,10 +127,10 @@ public class DemoController {
 
     @PostMapping("cryptionTest")
     @Cryption(CryptionModle.WHOLE_REQUEST)//请求时加密（框架自动解密）
-    public Map cryptionTest(@RequestBody Map inputMap) {
+    public Map cryptionTest(@RequestBody User inputUser) {
         Map result = new HashMap<>();
         result.put("isEncrypted", true);
-        result.put("msgFromClient", inputMap);
+        result.put("msgFromClient", inputUser);
         return result;
     }
 

@@ -136,13 +136,18 @@ krest是一款基于RESTful规则的轻量级框架套装，旨在整合无状�
    
    2. 与服务端约定一个不对称加密策略，仅用以加密解密临时秘钥（tempSecretKey）。公钥由客户端维护，私钥由服务端维护。客户端在访问服务端的加密接口前，将临时秘钥用不对称加密的公钥加密后放入头信息的Cryption字段中。伴随经临时秘钥加密的消息体一并发送到服务端对应的接口。
    
-   3. 您在服务端需要实现的配置为initTempSecretKeyCryptoAlgorithm（即步骤2中的加解密临时秘钥的不对称加密策略）和createMessageBodyCryptoAlgorithm（即步骤1中使用临时秘钥加解密消息体的对称加解密策略）两处
+   3. 以下是服务端部分：需要先在配置文件中开启接口加密功能：
+   ```yml
+        cryption.enable-cryption = true
+   ```
    
-   4. 服务端对应的加密接口由@Cryption注解标签修饰。该注解包含四种策略：请求时的消息体全加密、返回时的消息体全加密、以上二种叠加、自定义的局部消息加密。
+   4. 需要实现的配置为 configTempSecretKeyCryptoAlgorithm（即步骤2中的加解密临时秘钥的不对称加密策略）和createMessageBodyCryptoAlgorithm（即步骤1中使用临时秘钥加解密消息体的对称加解密策略）两处
    
-   5. 前三种加解密模式由框架自动完成。自定义局部信息加解密，通过调用KrestUtil.decryptMessageBody和KrestUtil.encryptMessageBody来加/解密您与客户端所约定的相应密文字段来实现。
+   5. 服务端对应的加密接口由@Cryption注解标签修饰。该注解包含四种策略：请求时的消息体全加密、返回时的消息体全加密、以上二种叠加、自定义的局部消息加密。
    
-   6. 在服务端加密配置和具体实现的语法参考krest-demo-1。在客户端将KrestDemo.postman_collection.json导入postman，参考这个。
+   6. 前三种加解密模式由框架自动完成。自定义局部信息加解密，通过调用KrestUtil.decryptMessageBody和KrestUtil.encryptMessageBody来加/解密您与客户端所约定的相应密文字段来实现。
+   
+   7. 在服务端加密配置和具体实现的语法参考krest-demo-1。在客户端将KrestDemo.postman_collection.json导入postman，参考这个。
 
 ## 后续开发计划
   * 完善javadoc注解

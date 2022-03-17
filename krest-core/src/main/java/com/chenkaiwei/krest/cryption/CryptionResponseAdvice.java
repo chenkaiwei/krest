@@ -5,6 +5,7 @@ import com.chenkaiwei.krest.KrestUtil;
 import com.chenkaiwei.krest.cryption.annotation.Cryption;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.MediaType;
@@ -19,6 +20,7 @@ import java.util.List;
 
 @Slf4j
 @RestControllerAdvice
+@ConditionalOnProperty(prefix = "krest.cryption",value = "enable-cryption",matchIfMissing = false)
 //@Order(1)//先加密msg再封装，本类优先调用
 public class CryptionResponseAdvice implements ResponseBodyAdvice<Object> {
 

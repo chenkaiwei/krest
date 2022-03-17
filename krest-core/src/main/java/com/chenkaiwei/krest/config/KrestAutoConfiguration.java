@@ -2,7 +2,9 @@ package com.chenkaiwei.krest.config;
 
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.crypto.asymmetric.AsymmetricCrypto;
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
+import com.auth0.jwt.algorithms.Algorithm;
 import com.chenkaiwei.krest.cryption.CryptionRequestAdvice;
 import com.chenkaiwei.krest.cryption.CryptionResponseAdvice;
 import com.chenkaiwei.krest.cryption.config.KrestMvcConfigurer;
@@ -55,7 +57,7 @@ public class KrestAutoConfiguration {
 
     @ConditionalOnMissingBean//TODO 有空研究：shiro里的那个自动securityManager也是OnMissingBean，为啥自动组装了这个没组装那个。
     @Bean //shiro里自动配置的securityManager带一个参数【securityManager(List<Realm> realms)】，所以写了名字才能整个代替它
-    public DefaultWebSecurityManager securityManager(KrestProperties krestProperties,KrestConfigurer krestConfigurer,List<Realm> realms) {
+    public DefaultWebSecurityManager securityManager(KrestProperties krestProperties,KrestConfigurer krestConfiguration,List<Realm> realms) {
         DefaultWebSecurityManager manager = new DefaultWebSecurityManager();
 
         //配置多个realm时的使用策略
@@ -102,7 +104,7 @@ public class KrestAutoConfiguration {
     @SneakyThrows
     @Bean
     @ConditionalOnMissingBean
-    public ShiroFilterFactoryBean shiroFilterFactoryBean(DefaultWebSecurityManager securityManager,KrestConfigurer krestConfigurer) {
+    public ShiroFilterFactoryBean shiroFilterFactoryBean(DefaultWebSecurityManager securityManager,KrestConfigurer krestConfiguration) {
         ShiroFilterFactoryBean factoryBean = new ShiroFilterFactoryBean();
 
         // 添加自己的过滤器并且取名为jwt
@@ -119,7 +121,7 @@ public class KrestAutoConfiguration {
          */
         Map<String, String> filterRuleMap = new HashMap<>();
 
-        krestConfigurer.configFilterChainDefinitionMap(filterRuleMap);
+        krestConfiguration.configFilterChainDefinitionMap(filterRuleMap);
 
         // 所有请求通过我们自己的authcBearerJwt Filter
         filterRuleMap.put("/**", "authcBearerJwt");//一条路径配俩filter的语法，逗号间隔(还是翻源码看出来的，官方文档都没有)
@@ -160,10 +162,10 @@ public class KrestAutoConfiguration {
     @Bean
     @ConditionalOnProperty(prefix = "krest",value = "enable-username-password-realm",matchIfMissing = false)
     //↑ 可选项，不显示设置则不装载
-    public UsernamePasswordRealm usernamePasswordRealm(KrestConfigurer krestConfigurer) {
+    public UsernamePasswordRealm usernamePasswordRealm(KrestConfigurer krestConfiguration) {
         UsernamePasswordRealm usernamePasswordRealm = new UsernamePasswordRealm();
-        CredentialsMatcher credentialsMatcher=krestConfigurer.configPasswordCredentialsMatcher();
-        Assert.notNull(credentialsMatcher,"您尚未实现krestConfigurer.createPasswordCredentialsMatcher()接口");
+        CredentialsMatcher credentialsMatcher=krestConfiguration.configPasswordCredentialsMatcher();
+        Assert.notNull(credentialsMatcher,"您尚未实现krestConfiguration.createPasswordCredentialsMatcher()接口");
         usernamePasswordRealm.setCredentialsMatcher(credentialsMatcher);//写到realm的构造器里去
         return usernamePasswordRealm;
     }
@@ -215,10 +217,24 @@ public class KrestAutoConfiguration {
     /*原shiro部分end*/
 
     @Bean
-    public Map<String, Collection<String>> rolePermissionsMap(KrestConfigurer krestConfigurer){
+    public Algorithm jwtAlgorithm(KrestConfigurer krestConfiguration){
+        return krestConfiguration.configJwtAlgorithm();
+    }
+
+    @Bean
+    public Map<String, Collection<String>> rolePermissionsMap(KrestConfigurer krestConfiguration){
         //↗入参部分，改成Autowire定义在外面就不行，这种写法就灵活很多，自动解决依赖顺序问题
-        Map<String, Collection<String>> res=krestConfigurer.configRolePermissionsMap();
+        Map<String, Collection<String>> res=krestConfiguration.configRolePermissionsMap();
+
+
         return res;
+    }
+
+    /*Cryption策略*/
+    @Bean
+    public AsymmetricCrypto tempSecretKeyCryptoAlgorithm(KrestConfigurer krestConfiguration){
+
+        return krestConfiguration.configTempSecretKeyCryptoAlgorithm();
     }
 
     @Bean
@@ -226,11 +242,11 @@ public class KrestAutoConfiguration {
     @ConditionalOnMissingBean
     @ConditionalOnProperty(prefix = "krest",value = "enable-fast-json-converter",matchIfMissing = true)
     //↑ 注意，用yml里的属性名，不是properties里的属性名（enableFastJsonConverter）。
-    public FastJsonHttpMessageConverter fastJsonHttpMessageConverter(KrestConfigurer krestConfigurer) {
+    public FastJsonHttpMessageConverter fastJsonHttpMessageConverter(KrestConfigurer krestConfiguration) {
 
         FastJsonHttpMessageConverter res = new FastJsonHttpMessageConverter();
 
-        res.setFastJsonConfig(krestConfigurer.fastJsonConverterConfig());
+        res.setFastJsonConfig(krestConfiguration.fastJsonConverterConfig());
 
         return res;
     }

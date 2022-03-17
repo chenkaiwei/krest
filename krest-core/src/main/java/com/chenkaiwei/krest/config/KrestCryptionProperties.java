@@ -7,5 +7,5 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Data
 @ConfigurationProperties(prefix = "krest.cryption")
 public class KrestCryptionProperties {
-    boolean enableCryption=true;
+    boolean enableCryption = false;
 }

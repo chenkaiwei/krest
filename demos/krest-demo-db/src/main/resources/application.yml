@@ -3,6 +3,8 @@ server:
 
 krest:
   enable-username-password-realm: true
+  cryption:
+    enable-cryption: false #关闭加密模式，默认也是关闭
 
 mybatis:
   mapper-locations: classpath:/mapper/*Dao.xml

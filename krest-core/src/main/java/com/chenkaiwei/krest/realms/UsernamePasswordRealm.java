@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class UsernamePasswordRealm extends AuthenticatingRealm {//只管验证不管鉴权
 
     @Autowired
-    KrestConfigurer krestConfigurer;
+    KrestConfigurer krestConfiguration;
 
 
     /*构造器*/
@@ -25,7 +25,7 @@ public class UsernamePasswordRealm extends AuthenticatingRealm {//只管验证�
         super();
         log.debug("new UsernamePasswordRealm()");
         //匹配器在AutoConfig里配了
-//        this.setCredentialsMatcher(krestConfigurer.initPasswordCredentialsMatcher());
+//        this.setCredentialsMatcher(krestConfiguration.initPasswordCredentialsMatcher());
     }
 
     /**
@@ -57,9 +57,9 @@ public class UsernamePasswordRealm extends AuthenticatingRealm {//只管验证�
 
         UsernamePasswordToken usernamePasswordToken=(UsernamePasswordToken) token;
 
-        KrestUsernamePasswordAuthenticationInfo kpai=krestConfigurer.doGetUsernamePasswordAuthenticationInfo(usernamePasswordToken);
+        KrestUsernamePasswordAuthenticationInfo kpai=krestConfiguration.doGetUsernamePasswordAuthenticationInfo(usernamePasswordToken);
 
-        Assert.notNull(kpai,"您尚未实现krestConfigurer.doGetUsernamePasswordAuthenticationInfo接口");
+        Assert.notNull(kpai,"您尚未实现krestConfiguration.doGetUsernamePasswordAuthenticationInfo接口");
 
         SimpleAuthenticationInfo res = new SimpleAuthenticationInfo(kpai.getJwtUser(),kpai.getPasswordInDB(), ByteSource.Util.bytes(kpai.getSalt()),getName());
         return res;

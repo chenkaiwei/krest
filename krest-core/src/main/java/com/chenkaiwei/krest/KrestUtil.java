@@ -4,6 +4,7 @@ import cn.hutool.crypto.symmetric.AES;
 import cn.hutool.crypto.symmetric.SymmetricCrypto;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.chenkaiwei.krest.config.KrestConfigurer;
+import com.chenkaiwei.krest.config.KrestCryptionProperties;
 import com.chenkaiwei.krest.config.KrestJwtProperties;
 import com.chenkaiwei.krest.entity.JwtUser;
 import com.chenkaiwei.krest.exceptions.KrestPasswordLoginException;
@@ -16,6 +17,7 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.subject.WebSubject;
 import org.apache.shiro.web.subject.support.WebDelegatingSubject;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -24,12 +26,18 @@ import org.springframework.stereotype.Component;
 public class KrestUtil {
 
 
-    private static KrestConfigurer krestConfigurer;
+    private static KrestConfigurer krestConfiguration;
+    private static KrestCryptionProperties krestCryptionProperties;
 
     @Autowired
-    public void setKrestConfigurer(KrestConfigurer krestConfigurer){
-        KrestUtil.krestConfigurer =krestConfigurer;
+    public void setKrestConfigurer(KrestConfigurer krestConfiguration){
+        KrestUtil.krestConfiguration =krestConfiguration;
     }
+    @Autowired
+    public void setKrestCryptionProperties(KrestCryptionProperties krestCryptionProperties){
+        KrestUtil.krestCryptionProperties=krestCryptionProperties;
+    }
+
 //    private static SymmetricCrypto getMessageBodyCryptoAlgorithm(){
 //        return messageBodyCryptoAlgorithm;
 //    }
@@ -103,12 +111,37 @@ public class KrestUtil {
 /*加解密部分，cryption部分*/
     //加解密方法
     public static String decryptMessageBody(String encryptedMessageBody) {
-
-        return getMessageBodyCryptoAlgorithm().decryptStr(encryptedMessageBody);
+//        if (krestCryptionProperties.isEnableCryption()){
+            return getMessageBodyCryptoAlgorithm().decryptStr(encryptedMessageBody);
+//        }else {
+//            return encryptedMessageBody;
+//        }
     }
     //解密方法
     public static String encryptMessageBody(String messageBody) {
 
-        return getMessageBodyCryptoAlgorithm().encryptBase64(messageBody);
+//        if (krestCryptionProperties.isEnableCryption()){
+            return getMessageBodyCryptoAlgorithm().encryptBase64(messageBody);
+//        }else{
+//            return messageBody;
+//        }
+    }
+
+
+    @Test
+    public void testAESCrypto(){
+
+        AES aes = new AES("CBC", "PKCS5Padding",
+                // 密钥，可以自定义
+                "128bitsSecretkey".getBytes(),
+                // iv加盐，按照实际需求添加
+                "1111222233334444".getBytes());
+
+        String eString=aes.encryptBase64("{'aaa':'来自客户端的消息内容rrr001002'}");
+
+        log.info(eString);
+
+        String dString=aes.decryptStr(eString);
+        log.info(dString);
     }
 }

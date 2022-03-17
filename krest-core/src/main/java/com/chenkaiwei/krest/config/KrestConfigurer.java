@@ -37,9 +37,9 @@ public interface KrestConfigurer {
         filterRuleMap.put("/register", "anon");
         filterRuleMap.put("/login", "anon");//确保即使login里带了token也能不参与验证
     }
-/*
-    开启UsernamePassword模式后使用 ↓
-*/
+    /*
+        开启UsernamePassword模式后使用 ↓
+    */
     default KrestUsernamePasswordAuthenticationInfo doGetUsernamePasswordAuthenticationInfo(UsernamePasswordToken usernamePasswordToken){
         return null;
     }
@@ -54,7 +54,7 @@ public interface KrestConfigurer {
     /*↓Cryption策略部分*/
 
     /*用于加解密临时秘钥的不对称加密，和客户端的公钥成对*/
-    default AsymmetricCrypto initTempSecretKeyCryptoAlgorithm(){
+    default AsymmetricCrypto configTempSecretKeyCryptoAlgorithm(){
         return null;
     };
 

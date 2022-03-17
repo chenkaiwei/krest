@@ -10,6 +10,7 @@ import com.chenkaiwei.krest.KrestUtil;
 import com.chenkaiwei.krest.cryption.annotation.Cryption;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
@@ -24,6 +25,7 @@ import java.lang.reflect.Type;
 
 @Slf4j
 @RestControllerAdvice
+@ConditionalOnProperty(prefix = "krest.cryption",value = "enable-cryption",matchIfMissing = false)
 public class CryptionRequestAdvice extends RequestBodyAdviceAdapter {
     //
 //////    //    @Value("${cryption.rsa.public-key}")

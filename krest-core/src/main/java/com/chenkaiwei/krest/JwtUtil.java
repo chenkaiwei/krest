@@ -23,25 +23,17 @@ public class JwtUtil {
     //纯工具类，不存用户级别的信息，只存全服务级别的配置。
 
     private static KrestJwtProperties krestJwtProperties;
-    private static KrestConfigurer krestConfigurer;
-
     private static Algorithm jwtAlgorithm;
 
 
+    //自动注入bean转静态变量的策略。
     @Autowired
     public void setKrestJwtProperties(KrestJwtProperties krestJwtProperties){
         JwtUtil.krestJwtProperties=krestJwtProperties;
     }
-
     @Autowired
-    public void setKrestConfigurer(KrestConfigurer krestConfigurer){
-        JwtUtil.krestConfigurer =krestConfigurer;
-        jwtAlgorithm=krestConfigurer.configJwtAlgorithm();
-    }
-
-
-    public static Algorithm getJwtAlgorithm(){
-        return jwtAlgorithm;
+    public void setJwtAlgorithm(Algorithm jwtAlgorithm){
+        JwtUtil.jwtAlgorithm=jwtAlgorithm;
     }
 
     public static String createJwtTokenByUser(JwtUser user) {
@@ -55,7 +47,7 @@ public class JwtUtil {
                 .withClaim("roles", user.getRoles())
 //                .withClaim("permissions",permissionService.getPermissionsByUser(user))
                 .withExpiresAt(date)  //过期时间
-                .sign(getJwtAlgorithm());     //签名算法
+                .sign(jwtAlgorithm);     //签名算法
         //r-p的映射在服务端运行时做，不放进token中
     }
 
@@ -68,7 +60,7 @@ public class JwtUtil {
 //        String secret = jwtTokenSecretKey;//
 
         //根据密钥生成JWT效验器
-        JWTVerifier verifier = JWT.require(getJwtAlgorithm())
+        JWTVerifier verifier = JWT.require(jwtAlgorithm)
                 .withClaim("username", getUsername(token))//从不加密的消息体中取出username
                 .build();
         //生成的token会有roles的Claim，这里不加不知道行不行。

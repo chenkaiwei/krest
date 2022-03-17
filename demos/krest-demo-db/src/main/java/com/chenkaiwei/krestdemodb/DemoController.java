@@ -82,27 +82,28 @@ public class DemoController {
 //
 //
 //    /*---加解密注解演示部分 ↓ ---*/
+    /*关闭加密功能后，密文不会解密，不合json格式。所以会报无法解析成json的错*/
 //
-//    @PostMapping("cryptBothTest")
-//    @Cryption(CryptionModle.BOTH)//默认REQUEST
-//    public User cryptApiTest(@RequestBody User inputUser) {
-//        return inputUser;
-//    }
+    @PostMapping("cryptBothTest")
+    @Cryption(CryptionModle.BOTH)//默认REQUEST
+    public User cryptApiTest(@RequestBody User inputUser) {
+        return inputUser;
+    }
 //
-//    @PostMapping("cryptionTest")
-//    @Cryption(CryptionModle.WHOLE_REQUEST)//请求时加密（框架自动解密）
-//    public Map cryptionTest(@RequestBody Map inputMap) {
-//        Map result = new HashMap<>();
-//        result.put("isEncrypted", true);
-//        result.put("msgFromClient", inputMap);
-//        return result;
-//    }
+    @PostMapping("cryptionTest")
+    @Cryption(CryptionModle.WHOLE_REQUEST)//请求时加密（框架自动解密）
+    public Map cryptionTest(@RequestBody Map inputMap) {
+        Map result = new HashMap<>();
+        result.put("isEncrypted", true);
+        result.put("msgFromClient", inputMap);
+        return result;
+    }
 //
-//    @PostMapping("cryptJustOutTest")
-//    @Cryption(CryptionModle.WHOLE_RESPONSE)//返回值加密
-//    public User cryptJustOutTest(@RequestBody User inputUser) {
-//        return inputUser;
-//    }
+    @PostMapping("cryptJustOutTest")
+    @Cryption(CryptionModle.WHOLE_RESPONSE)//返回值加密
+    public User cryptJustOutTest(@RequestBody User inputUser) {
+        return inputUser;
+    }
 //
 
 }

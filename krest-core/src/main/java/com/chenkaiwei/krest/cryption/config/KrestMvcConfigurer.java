@@ -7,6 +7,7 @@ import com.chenkaiwei.krest.config.KrestCryptionProperties;
 import com.chenkaiwei.krest.config.KrestProperties;
 import com.chenkaiwei.krest.cryption.CryptionInterceptor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.util.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
@@ -30,7 +31,7 @@ public class KrestMvcConfigurer implements WebMvcConfigurer {//TODO 看源码应
     @Autowired
     KrestCryptionProperties  krestCryptionProperties;
 
-    @Autowired
+    @Autowired(required = false)
     CryptionInterceptor cryptionInterceptor;
 //
 //    @Autowired
@@ -52,7 +53,8 @@ public class KrestMvcConfigurer implements WebMvcConfigurer {//TODO 看源码应
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        if (krestCryptionProperties.isEnableCryption()){
+        if (cryptionInterceptor!=null){
+            log.debug("cryptionInterceptor added");
             registry.addInterceptor(cryptionInterceptor).addPathPatterns("/**");
         }
     }

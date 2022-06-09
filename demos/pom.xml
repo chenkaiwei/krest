@@ -18,7 +18,7 @@
             <dependency>
                 <groupId>com.chenkaiwei.krest</groupId>
                 <artifactId>krest-core</artifactId>
-                <version>1.0.4-SNAPSHOT</version>
+                <version>1.0.5</version>
 <!--
                 ↑ core版本更新时只要更新这里，下面具体的demo就会自动引用最新包。
 -->

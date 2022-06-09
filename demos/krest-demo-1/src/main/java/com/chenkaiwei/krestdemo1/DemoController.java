@@ -20,48 +20,12 @@ import java.util.Map;
 @RestController
 @Slf4j
 public class DemoController {
-//public class DemoController implements ErrorController {
-//
-///*error试验区*/
-//    @Autowired
-//    private ErrorAttributes errorAttributes;
-//
-//    @RequestMapping("/error")
-//    Map error(HttpServletRequest request) throws Throwable {
-//        log.info("error");
-//        WebRequest webRequest = new ServletWebRequest(request);
-//        Throwable error = (Throwable) webRequest.getAttribute("javax.servlet.error.exception", 0);
-//
-//        if (error instanceof ShiroException||
-//                error instanceof JWTVerificationException||
-//                error.getCause() instanceof ShiroException)
-//        {
-//            throw error;
-//        }
-//
-//        ErrorAttributeOptions eao = ErrorAttributeOptions.of(
-//                ErrorAttributeOptions.Include.EXCEPTION);
-//        Map<String, Object> errorMap = errorAttributes.getErrorAttributes(webRequest, eao);
-//
-//
-//        return errorMap;
-//    }
-////
-//    @ExceptionHandler(KrestException.class)
-//    public Map<String,String> krestException(KrestException e) {
-////TODO shiro里配的会自动跳到error路径上处理，不走这个，待解决。
-//        Map<String,String> res=new HashMap<>();
-//        res.put("result",e.getLocalizedMessage());
-//
-//        return res;
-//    }
-
-
 
     /**
      * 登陆
      */
     @PostMapping("/login")
+//    @CrossOrigin
     public Map login(@RequestBody User userInput) throws Exception {
 
         log.info(userInput.toString());
@@ -94,8 +58,6 @@ public class DemoController {
 
     @GetMapping("/whoami")
     public Map whoami(){
-
-
         Map<String,String> res=new HashMap<>();
         res.put("result","you are "+KrestUtil.getJwtUser().toString());
         res.put("token",KrestUtil.createNewJwtTokenIfNeeded());
@@ -113,6 +75,7 @@ public class DemoController {
 
         return res;
     }
+
 
 
 
@@ -135,9 +98,25 @@ public class DemoController {
     }
 
     @PostMapping("cryptJustOutTest")
-    @Cryption(CryptionModle.WHOLE_RESPONSE)//返回值加密
+    @Cryption(CryptionModle.WHOLE_RESPONSE)//返回值整体加密
     public User cryptJustOutTest(@RequestBody User inputUser) {
         return inputUser;
+    }
+
+    @PostMapping("cryptionCustomize")
+    @Cryption(CryptionModle.CUSTOMIZE)
+    public Map cryptionCustomize(@RequestBody Map inputObj){
+
+        String cryptionPart=(String)inputObj.get("cryptionPart");
+        String decryptMessageBody=KrestUtil.decryptMessageBody(cryptionPart);
+        //↑解密请求信息中被加密的部分
+
+        Map result = new HashMap<>();
+        result.put("cryptionPart", decryptMessageBody);
+        result.put("nocryptionPart", inputObj.get("nocryptionPart"));
+        result.put("whoyouare",KrestUtil.getJwtUser());
+        result.put("token",KrestUtil.createNewJwtTokenIfNeeded());
+        return result;
     }
 
 

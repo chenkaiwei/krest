@@ -9,6 +9,8 @@ import com.chenkaiwei.krest.entity.KrestUsernamePasswordAuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authc.credential.CredentialsMatcher;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -31,11 +33,11 @@ public interface KrestConfigurer {
 
     /*shiro部分*/
     default void configFilterChainDefinitionMap(Map<String, String> filterRuleMap){
-        //默认这四个匹配规则不验证jwt，如果覆盖这四个也要重新加上
+        //默认这四个匹配规则不验证jwt，如果覆盖后还需要这四个请自行重新加上
         filterRuleMap.put("/static/*", "anon");
         filterRuleMap.put("/error", "anon");
         filterRuleMap.put("/register", "anon");
-        filterRuleMap.put("/login", "anon");//确保即使login里带了token也能不参与验证
+        filterRuleMap.put("/login", "anon");//勿漏，否则会先走jwt验证而导致请求被拒
     }
     /*
         开启UsernamePassword模式后使用 ↓
@@ -47,9 +49,6 @@ public interface KrestConfigurer {
     default CredentialsMatcher configPasswordCredentialsMatcher(){
         return null;
     }
-
-
-
 
     /*↓Cryption策略部分*/
 
@@ -82,5 +81,8 @@ public interface KrestConfigurer {
         return fj;
     }
 
+    /*固定请求头设置，主要用于跨域*/
+    default void configHeaders(HttpServletRequest request, HttpServletResponse response){
 
+    }
 }

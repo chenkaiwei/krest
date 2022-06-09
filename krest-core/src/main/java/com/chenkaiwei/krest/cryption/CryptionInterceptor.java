@@ -38,7 +38,13 @@ public class CryptionInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         //当目标方法被Cryption修饰时，解密出临时秘钥，存入request.attributes。
 
-        Method method=((HandlerMethod)handler).getMethod();
+        Method method;
+        if (handler instanceof HandlerMethod){
+            method=((HandlerMethod)handler).getMethod();
+        }else {
+            return true;
+        }
+
         if(method.isAnnotationPresent(Cryption.class)){
             String cryptionString=(String)request.getHeader("cryption");
 

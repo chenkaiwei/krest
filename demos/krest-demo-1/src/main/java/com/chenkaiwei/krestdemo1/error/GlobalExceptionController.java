@@ -19,7 +19,7 @@ import java.util.Map;
 public class GlobalExceptionController {
 
     //按你自己的方式来统一返回格式，此处仅做示例，为了好懂就不抽象了。
-    @ExceptionHandler(KrestAuthenticationException.class)
+    @ExceptionHandler({KrestAuthenticationException.class,AuthenticationException.class})
     public ResponseEntity KrestAuthenticationExceptionHandler(KrestAuthenticationException e) {
         log.error("krestExceptionHandler");
         log.error(e.getLocalizedMessage());
@@ -32,19 +32,6 @@ public class GlobalExceptionController {
         return new ResponseEntity(body, HttpStatus.FORBIDDEN);//仅是示例，按需求定义
     }
 
-    // 身份验证错误
-    @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity authenticationExceptionHandler(AuthenticationException e) {
-        log.error("AuthenticationException");
-        log.error(e.getLocalizedMessage());
-
-        Map<String,Object> body=new HashMap<String,Object>();
-        body.put("status",HttpStatus.FORBIDDEN.value());
-        body.put("message",e.getLocalizedMessage());
-        body.put("exception",e.getClass().getName());
-        body.put("error",HttpStatus.FORBIDDEN.getReasonPhrase());
-        return new ResponseEntity(body, HttpStatus.FORBIDDEN);//仅是示例，按需求定义
-    }
 
     //权限验证错误
     @ExceptionHandler(UnauthorizedException.class)
@@ -58,20 +45,6 @@ public class GlobalExceptionController {
         body.put("exception",e.getClass().getName());
         body.put("error",HttpStatus.UNAUTHORIZED.getReasonPhrase());
         return new ResponseEntity(body, HttpStatus.UNAUTHORIZED);//仅是示例，按需求定义
-    }
-
-
-    //对应路径不存在
-    @ExceptionHandler(NoHandlerFoundException.class)
-    public ResponseEntity noHandlerFoundExceptionHandler(NoHandlerFoundException e) {
-        log.error("noHandlerFoundExceptionHandler");
-        log.error(e.getLocalizedMessage());
-
-        Map<String,Object> body=new HashMap<String,Object>();
-        body.put("message",e.getLocalizedMessage());
-        body.put("exception",e.getClass().getName());
-        body.put("error",HttpStatus.NOT_FOUND.getReasonPhrase());
-        return new ResponseEntity(body, HttpStatus.NOT_FOUND);//仅是示例，按需求定义
     }
     @ExceptionHandler(Exception.class)
     public ResponseEntity exceptionHandler(Exception e) {

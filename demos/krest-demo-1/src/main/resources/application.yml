@@ -3,9 +3,9 @@
 krest:
   enable-username-password-realm: true
   jwt:
-    expire-time: 3m
+    expire-time: 10m
     #↑token过期时间，默认20分钟
-    refresh-time-before-expire: 2m
+    refresh-time-before-expire: 5m
     #↑过期前多久更新token。默认10分钟。若设为与expire-time一致则每次请求都会刷新。
   cryption:
     enable-cryption: true
@@ -16,6 +16,7 @@ server:
 logging:
   level:
     com.chenkaiwei: debug
+#    root: debug
 
 #spring:
 #  main:

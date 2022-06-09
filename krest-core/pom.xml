@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.chenkaiwei.krest</groupId>
         <artifactId>krest-parent</artifactId>
-        <version>1.0.4-SNAPSHOT</version>
+        <version>1.0.5</version>
         <relativePath>../pom.xml</relativePath><!-- lookup parent from repository -->
     </parent>
     <groupId>com.chenkaiwei.krest</groupId>
@@ -13,7 +13,7 @@
     <name>krest-core</name>
     <version>${project.parent.version}</version>
     <packaging>jar</packaging>
-    <description>krest-core project for Spring Boot</description>
+    <description>krest是一款基于Java的轻量级RESTful框架套装，旨在整合no-session服务中常见的基础模块（身份验证、权限控制、通信加密等），并提供统一的配置方式和精简的使用方式。</description>
     <dependencies>
 
         <!--自动生成spring-configuration-metadata.json，用于配置文件yml自动补全-->

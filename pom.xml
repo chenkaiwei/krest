@@ -10,11 +10,11 @@
     </parent>
     <groupId>com.chenkaiwei.krest</groupId>
     <artifactId>krest-parent</artifactId>
-    <version>1.0.4-SNAPSHOT</version><!-- ←每次这里更改，core和demos里跟着各改一处，保证一致-->
+    <version>1.0.5</version><!-- ←每次这里更改，core和demos里跟着各改一处，保证一致-->
     <!-- Snapshot 方便拷贝-->
     <name>krest</name>
     <packaging>pom</packaging>
-    <description>KRest是一款整合了shiro和jwt的RESTful服务框架，一体配置，简便易用。</description>
+    <description>KRest是一款整合了shiro、jwt和通信加密功能的RESTful服务框架，只需完成最为必要的个性化配置，即可直接使用。</description>
     <url>https://gitee.com/ckw1988/krest</url>
 
     <properties>

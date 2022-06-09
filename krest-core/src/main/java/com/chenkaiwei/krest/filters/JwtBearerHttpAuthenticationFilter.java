@@ -11,12 +11,21 @@ import org.apache.shiro.authc.BearerToken;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.authc.BearerHttpAuthenticationFilter;
 import org.apache.shiro.web.subject.support.WebDelegatingSubject;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @Slf4j
 public class JwtBearerHttpAuthenticationFilter extends BearerHttpAuthenticationFilter {
+
+    @Override
+    protected boolean preHandle(ServletRequest request, ServletResponse response) throws Exception {
+        return super.preHandle(request,response);
+    }
 
     //filter会自动在on调用login，所以不用专门在这里调用executeLogin
     @Override
@@ -51,9 +60,12 @@ public class JwtBearerHttpAuthenticationFilter extends BearerHttpAuthenticationF
 
     @Override
     protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
-       boolean res=super.onAccessDenied(request, response);
-       log.info("onAccessDenied "+res);
+//        //https://blog.csdn.net/m0_67391521/article/details/123837073
+        HttpServletResponse httpResponse = (HttpServletResponse) response;
+        HttpServletRequest httpRequest = (HttpServletRequest) request;
 
+        boolean res=super.onAccessDenied(request, response);//jwt的登录在这里面
+        log.info("onAccessDenied "+res);
         if (!res){
             throw new KrestTokenException("token失效或异常，请重新登录");//jwt验证器的错误抛不上来，应该是shiro机制的不完善（）
         }
@@ -74,4 +86,5 @@ public class JwtBearerHttpAuthenticationFilter extends BearerHttpAuthenticationF
         好点的设计应该是把所有异常都放在cause里，即使搞成一个数组也行
 */
     }
+
 }

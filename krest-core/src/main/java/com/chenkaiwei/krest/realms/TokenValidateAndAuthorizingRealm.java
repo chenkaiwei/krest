@@ -71,7 +71,7 @@ https://blog.csdn.net/weixin_40423597/article/details/80643990
                 父类.class.isAssignableFrom(子类.class)
         子类实例 instanceof 父类类型
 */
-        res = token != null && (token instanceof BearerToken);//换个语法，不直接抄框架里原有的
+        res = token != null && (token instanceof BearerToken);//换个语法，不直接抄框架
 
         log.debug("[TokenValidateRealm is supports]" + res);
         return res;
@@ -119,8 +119,6 @@ https://blog.csdn.net/weixin_40423597/article/details/80643990
         /*Constructor that takes in an account's identifying principal(s) and its corresponding credentials that verify the principals.*/
 //        这个返回值是造Subject用的，返回值供createSubject使用
         return res;
-
-
     }
 
 }

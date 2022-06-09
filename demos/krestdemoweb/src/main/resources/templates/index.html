@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- 来源：https://blog.csdn.net/qq_39630624/article/details/120370790 -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+<button id="login">admin登陆</button>
+<p/>
+<button id="whoami">whoami</button>
+<p/>
+<script>
+    // // 将来后端返回的数据用形参data接收
+    // function getName(data) {
+    //     console.log('data');
+    //     console.log(data);
+    // }
+    var token
+    document.querySelector('#login').onclick = function () {
+        console.log('login');
+        // 登陆接口，获得token
+        var xhr = new XMLHttpRequest()
+        xhr.open('post', 'http://127.0.0.1:6001/login')
+        xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8')
+        xhr.send(JSON.stringify({
+            "username":"zhang3",
+            "password":"12345"
+        }))
+        xhr.onload = function () {
+            console.log('xhr.responseText');
+            console.log(xhr.responseText);
+            data= JSON.parse(xhr.responseText)
+            token=data.token
+            console.log(data.token);
+        }
+    }
+
+    document.querySelector('#whoami').onclick = function () {
+        console.log('whoami');
+        console.log('the token is '+token)
+        // 登陆接口，获得token
+        var xhr = new XMLHttpRequest()
+        xhr.open('get', 'http://127.0.0.1:6001/whoami')
+        xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8')
+        xhr.setRequestHeader('Authorization', "Bearer "+token)
+        xhr.send("")
+        xhr.onload = function () {
+            console.log('xhr.responseText');
+            console.log(xhr.responseText);
+        }
+    }
+
+</script>
+<!-- <script src="http://localhost:9999/index?callback=getName"></script> -->
+</body>
+
+</html>

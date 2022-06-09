@@ -8,6 +8,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.chenkaiwei.krest.cryption.CryptionRequestAdvice;
 import com.chenkaiwei.krest.cryption.CryptionResponseAdvice;
 import com.chenkaiwei.krest.cryption.config.KrestMvcConfigurer;
+import com.chenkaiwei.krest.filters.CorsFilter;
 import com.chenkaiwei.krest.filters.JwtBearerHttpAuthenticationFilter;
 import com.chenkaiwei.krest.JwtUtil;
 import com.chenkaiwei.krest.realms.TokenValidateAndAuthorizingRealm;
@@ -26,8 +27,14 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.*;
 @Slf4j
 @Configuration
@@ -110,6 +117,7 @@ public class KrestAutoConfiguration {
         // 添加自己的过滤器并且取名为jwt
 
         Map<String, Filter> filterMap = new HashMap<>();
+        filterMap.put("cors",new CorsFilter(krestConfiguration));
         filterMap.put("authcBearerJwt", new JwtBearerHttpAuthenticationFilter());//定义filter
         //默认过滤器：authcBearer-BearerHttpAuthenticationFilter
 
@@ -127,7 +135,7 @@ public class KrestAutoConfiguration {
         filterRuleMap.put("/**", "authcBearerJwt");//一条路径配俩filter的语法，逗号间隔(还是翻源码看出来的，官方文档都没有)
 
         //  perms[actuator] 对应 PermissionsAuthorizationFilter
-        factoryBean.setGlobalFilters(Arrays.asList("noSessionCreation"));//对应NoSessionCreationFilter，全局无状态
+        factoryBean.setGlobalFilters(Arrays.asList("cors","noSessionCreation"));//对应NoSessionCreationFilter，全局无状态
 
         factoryBean.setUnauthorizedUrl("/unauthorized");//有用没用？
 
@@ -250,4 +258,28 @@ public class KrestAutoConfiguration {
 
         return res;
     }
+
+
+    //跨域问题
+    //https://blog.csdn.net/xuedapeng/article/details/79076704
+//    @Bean
+//    public OncePerRequestFilter corsDemoFilter() {
+//
+//        OncePerRequestFilter res = new OncePerRequestFilter() {
+//            @Override
+//            protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain filterChain) throws ServletException, IOException {
+////
+//                HttpServletRequest request = (HttpServletRequest) req;
+//                HttpServletResponse response = (HttpServletResponse) res;
+//
+//                response.setHeader("Access-Control-Allow-Origin", "http://127.0.0.1:6009");//末尾不能有"/"  //TODO 做成用户配置的
+//
+//                response.setHeader("Access-Control-Allow-Methods", "*");
+//                response.setHeader("Access-Control-Allow-Headers", "Content-Type,Authorization,Cryption");
+//
+//                filterChain.doFilter(request, response);
+//            }
+//        };
+//        return res;
+//    }
 }
